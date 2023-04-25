@@ -4,6 +4,8 @@ from django.template.defaultfilters import slugify
 
 from users.models import User
 
+MIN_COOKING_VALUE = 1
+
 
 class Ingredient(models.Model):
     name = models.CharField(
@@ -103,7 +105,7 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления',
-        validators=[MinValueValidator(1)],
+        validators=[MinValueValidator(MIN_COOKING_VALUE)],
     )
 
     class Meta:
