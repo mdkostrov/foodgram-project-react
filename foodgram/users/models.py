@@ -37,31 +37,32 @@ class User(AbstractUser):
         return self.username
 
 
-class Subscribe(models.Model):
+class Follow(models.Model):
+    """Модель подписки на авторов рецептов"""
     user = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='subscriber',
+        related_name='follower',
         verbose_name='Подписчик',
     )
-    author = models.ForeignKey(
+    following = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='subscribing',
-        verbose_name='Автор рецепта',
+        related_name='following',
+        verbose_name='Подписан на автора',
     )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'author'],
+                fields=['user', 'following'],
                 name='unique_subscribes'
             ),
             models.CheckConstraint(
-                check=~models.Q(user=models.F('author')),
-                name='check_selfsubscribe'
+                check=~models.Q(user=models.F('following')),
+                name='check_self_follow'
             ),
         ]
         verbose_name = 'Подписка на автора'
         verbose_name_plural = 'Подписки'
 
     def __str__(self):
-        return f'Пользователь {self.user} подписан на {self.author}'
+        return f'Пользователь {self.user} подписан на {self.following}'
