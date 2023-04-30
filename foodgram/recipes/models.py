@@ -10,7 +10,6 @@ class Ingredient(models.Model):
     """Модель ингредиента"""
     name = models.CharField(
         'Название ингредиента',
-        unique=True,
         max_length=200,
         db_index=True,
         help_text='Введите название ингредиента',
@@ -33,7 +32,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
-        return f'{self.name} ({self.measurement_unit})'
+        return f'{self.name}, {self.measurement_unit}.'
 
 
 class Tag(models.Model):

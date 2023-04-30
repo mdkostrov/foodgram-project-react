@@ -9,7 +9,7 @@ def username_validator(value):
             'Имя пользователя не может быть <me>.',
             params={'value': value},
         )
-    if fullmatch(r'^[\w.@+-]+\z', value) is None:
+    if fullmatch(r'^[\w.@+-]+$', value) is None:
         raise ValidationError(
             'В имени пользователя допускаются только '
             'буквы, цифры и @/./+/- знаки.',

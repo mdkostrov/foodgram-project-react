@@ -8,6 +8,7 @@ from .models import (Ingredient, RecipeIngredient, Tag,
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'measurement_unit')
+    list_display_links = ('id', 'name',)
     fields = ('name',)
     ordering = ('name',)
     search_fields = ('name',)
@@ -40,6 +41,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'author', 'text',
                     'cooking_time', 'is_favorited',
                     'ingredients_in_recipe')
+    list_display_links = ('name',)
     fields = ('name', 'text',
               'author', 'image',
               'tags', 'cooking_time')
@@ -48,7 +50,7 @@ class RecipeAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
     readonly_fields = ('is_favorited',)
 
-    @admin.display(description='Количество избраного')
+    @admin.display(description='В избранном')
     def is_favorited(self, obj):
         return obj.favorite.count()
 
