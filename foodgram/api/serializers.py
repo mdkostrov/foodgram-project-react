@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
@@ -144,6 +144,7 @@ class AddIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    """Сериалайзер рецепта"""
     author = MyUserSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     ingredients = RecipeIngredientSerializer(
@@ -164,8 +165,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             'is_favorited', 'is_in_shopping_cart'
         )
 
-# BooleanField для избранного и корзины
-
     def get_request(self, obj, model):
         request = self.context.get('request')
         return (request and request.user.is_authenticated
@@ -180,6 +179,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class AddRecipeSerializer(serializers.ModelSerializer):
+    """Сериалайзер добавления рецепта"""
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
     image = Base64ImageField()
@@ -192,26 +192,6 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author',
                   'ingredients', 'name',
                   'image', 'text', 'cooking_time')
-
-    def validate_ingredient(self, value):
-        ingredient = value
-        if not ingredient:
-            raise serializers.ValidationError(
-                'Заполните поле ингредиентов'
-            )
-        ingredients_list = []
-        for item in ingredient:
-            ingredients = get_object_or_404(Ingredient, id=item['id'])
-            if ingredients in ingredients_list:
-                raise serializers.ValidationError(
-                    'Ингредиенты не должны повторяться'
-                )
-            if int(item['amount']) <= 1:
-                raise serializers.ValidationError(
-                    'Количество ингредиентов должно быть больше одного'
-                )
-            ingredients_list.append(ingredients)
-        return value
 
     def validate_tags(self, value):
         tags = value
@@ -228,17 +208,37 @@ class AddRecipeSerializer(serializers.ModelSerializer):
             tag_list.append(tag)
         return value
 
+    def validate_ingredient(self, value):
+        ingredient = value
+        if not ingredient:
+            raise serializers.ValidationError(
+                'Заполните поле ингредиентов'
+            )
+        ingredients_list = []
+        for item in ingredient:
+            ingredients = get_object_or_404(Ingredient, id=item['id'])
+            if ingredients in ingredients_list:
+                raise serializers.ValidationError(
+                    'Ингредиенты не должны повторяться'
+                )
+            if int(item['amount']) <= 1:
+                raise serializers.ValidationError(
+                    'Количество ингредиентов должно быть больше одного!'
+                )
+            ingredients_list.append(ingredients)
+        return value
+
     def validate_cooking_time(self, data):
         if data <= 0:
             raise serializers.ValidationError(
-                'Время приготовление не меньше минуты'
+                'Время приготовление не меньше минуты!'
             )
         return data
 
     def to_representation(self, instance):
         return RecipeSerializer(instance).data
 
-    @transaction.atomic
+    @atomic
     def create_ingredients(self, ingredients, recipe):
         RecipeIngredient.objects.bulk_create(
             [RecipeIngredient(
@@ -248,7 +248,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
             ) for ingredient in ingredients]
         )
 
-    @transaction.atomic
+    @atomic
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
@@ -260,7 +260,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         self.create_ingredients(ingredients, recipe)
         return recipe
 
-    @transaction.atomic
+    @atomic
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')

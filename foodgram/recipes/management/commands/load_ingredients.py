@@ -1,16 +1,8 @@
 import csv
-import logging
 from django.conf import settings
 from django.core.management import BaseCommand, CommandError
 
 from recipes.models import Ingredient
-
-logging.basicConfig(
-    level=logging.INFO,
-    filename='main.log',
-    format='%(asctime)s, %(levelname)s, %(name)s, %(message)s',
-    filemode='w',
-)
 
 
 class Command(BaseCommand):
@@ -34,4 +26,3 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('Все ингридиенты загружены!'))
         except FileNotFoundError:
             raise CommandError('Добавьте файл ingredients в директорию data')
-        logging.info('Successfully loaded all data into database')

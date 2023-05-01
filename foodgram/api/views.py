@@ -94,7 +94,7 @@ class RecipeViewSet(ModelViewSet):
     def create_obj(request, pk, model, serializer):
         recipe = get_object_or_404(Recipe, pk=pk)
         if model.objects.filter(recipe=recipe, user=request.user).exists():
-            return Response(status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         model(recipe=recipe, user=request.user).save()
         serializer = serializer(get_object_or_404(Recipe, id=pk),
                                 context={'request': request})
@@ -102,8 +102,10 @@ class RecipeViewSet(ModelViewSet):
 
     @staticmethod
     def delete_obj(request, pk, model):
-        get_object_or_404(model, recipe=pk, user=request.user).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if model.objects.filter(recipe=pk, user=request.user).exists():
+            get_object_or_404(model, recipe=pk, user=request.user).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'],
             permission_classes=[IsAuthenticated])
@@ -135,10 +137,10 @@ class RecipeViewSet(ModelViewSet):
         ).order_by(
             'name'
         ).annotate(total=Sum('ingredients_list__amount'))
-        shopping_list = []
-        for _ in ingredients:
+        shopping_list = ['Список покупок: ', ]
+        for num, _ in enumerate(ingredients):
             shopping_list.append(
-                f'{_["name"]}: {_["total"]} {_["measurement"]}'
+                f'{num + 1}. {_["name"]} = {_["total"]} {_["measurement"]}'
             )
         text = '\n'.join(shopping_list)
         filename = 'foodgram_shopping_list.txt'
