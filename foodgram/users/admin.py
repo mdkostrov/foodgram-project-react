@@ -6,6 +6,7 @@ from .models import Follow, User
 
 admin.site.unregister(Group)
 
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
