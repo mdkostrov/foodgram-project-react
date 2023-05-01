@@ -133,3 +133,4 @@ dmypy.json
 
 recipe_pics/
 media/
+static/
