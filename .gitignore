@@ -134,4 +134,6 @@ dmypy.json
 sent_emails/
 recipe_pics/
 media/
+media_back/
 static/
+static_back/
