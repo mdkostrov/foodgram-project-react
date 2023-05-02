@@ -56,11 +56,11 @@ scp nginx.conf <username>@<host>:/home/<username>/nginx.conf
 - Создать .env файл по предлагаемому шаблону.
 - Для работы с Workflow добавить в Secrets GitHub переменные окружения:
 
-    ```
+    ```bash
     DB_ENGINE=<django.db.backends.postgresql>
     DB_NAME=<имя базы данных postgres>
-    DB_USER=<пользователь бд>
-    DB_PASSWORD=<пароль>
+    POSTGRES_USER=<пользователь бд>
+    POSTGRES_PASSWORD=<пароль>
     DB_HOST=<db>
     DB_PORT=<5432>
 
@@ -79,11 +79,11 @@ scp nginx.conf <username>@<host>:/home/<username>/nginx.conf
     ```
 
     Workflow состоит из четырёх шагов:
-    - Проверка кода на соответствие PEP8
-    - Сборка и публикация образа бекенда на DockerHub.
-    - Автоматический деплой на удаленный сервер.
-    - Отправка уведомления в телеграм-чат.
-    - собрать и запустить контейнеры на сервере
+- Проверка кода на соответствие PEP8
+- Сборка и публикация образа бекенда на DockerHub.
+- Автоматический деплой на удаленный сервер.
+- Отправка уведомления в телеграм-чат.
+- собрать и запустить контейнеры на сервере
 
 ```bash
 docker-compose up -d --build
