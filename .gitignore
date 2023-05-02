@@ -131,6 +131,7 @@ dmypy.json
 # .idea
 .idea
 
+sent_emails/
 recipe_pics/
 media/
 static/
