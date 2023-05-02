@@ -6,7 +6,7 @@
 <summary>
 >>>Для ревьюера<<<
 </summary>
-##### АДРЕС ПРОЕКТА НА ВМ ДЛЯ РЕВЬЮ:
+АДРЕС ПРОЕКТА НА ВМ ДЛЯ РЕВЬЮ:
 http://51.250.78.62/
 </details>
 
@@ -21,33 +21,41 @@ Foodgram («Продуктовый помощник») позволяет люб
 В проекте использованы следующие технологии:
 Python 3.7, Django 3.2, Django REST Framework 3.12.4, Djoser 2.1.0, Gunicorn 20.1.0, nginx 1.21.3-alpine, PostgreSQL 13.0-alpine.
 
-<details>
-<summary>
-Деплой проекта на удаленном сервере.
-</summary>
+### Деплой проекта на удаленном сервере.
+
 для Linux-систем все команды необходимо выполнять от имени администратора
+
 - Склонировать репозиторий
+
 ```bash
 git clone https://github.com/mdkostrov/foodgram-project-react.git
 ```
+
 - Выполнить вход на удаленный сервер
 - Обновить пакеты
-- Установить docker на сервер:
+- Установить docker на сервер
+
 ```bash
 sudo apt install docker.io
 ```
+
 - Установить docker-compose на сервер:
+
 ```bash
 sudo apt install docker-compose
 ```
-- Локально отредактировать файл infra/nginx.conf, обязательно в строке server_name вписать IP-адрес сервера
-- Скопировать файлы docker-compose.yml и nginx.conf из директории infra на сервер:
+
+- Локально отредактировать файл infra/nginx.conf, в строке server_name вписать IP-адрес сервера
+- Скопировать файлы docker-compose.yml и nginx.conf из директории infra на сервер
+
 ```bash
 scp docker-compose.yml <username>@<host>:/home/<username>/docker-compose.yml
 scp nginx.conf <username>@<host>:/home/<username>/nginx.conf
 ```
+
 - Создать .env файл по предлагаемому шаблону.
 - Для работы с Workflow добавить в Secrets GitHub переменные окружения:
+
     ```
     DB_ENGINE=<django.db.backends.postgresql>
     DB_NAME=<имя базы данных postgres>
@@ -69,26 +77,30 @@ scp nginx.conf <username>@<host>:/home/<username>/nginx.conf
     TELEGRAM_TO=<ID чата, в который придет сообщение>
     TELEGRAM_TOKEN=<токен вашего бота>
     ```
+
     Workflow состоит из четырёх шагов:
-     - Проверка кода на соответствие PEP8
-     - Сборка и публикация образа бекенда на DockerHub.
-     - Автоматический деплой на удаленный сервер.
-     - Отправка уведомления в телеграм-чат.
-- собрать и запустить контейнеры на сервере:
+    - Проверка кода на соответствие PEP8
+    - Сборка и публикация образа бекенда на DockerHub.
+    - Автоматический деплой на удаленный сервер.
+    - Отправка уведомления в телеграм-чат.
+    - собрать и запустить контейнеры на сервере
+
 ```bash
 docker-compose up -d --build
 ```
+
 - После успешной сборки выполнить следующие действия (только при первом деплое):
-    * провести миграции внутри контейнеров:
+    * провести миграции внутри контейнеров
+
     ```bash
     docker-compose exec web python manage.py migrate
+    ```
 
-    * Заполнить БД:
+    * Заполнить БД
+
     ```bash
     docker-compose exec web python manage.py loaddata dump.json
-</details>
-<br />
-<br />
+    ```
 
 ### Как запустить проект локально на dev-сервере
 
