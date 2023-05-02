@@ -16,7 +16,7 @@ services:
       - static_value:/app/static_back/
       - media_value:/app/media_back/
   frontend:
-    image: retrogm/foodgram-front:latest
+    image: retrogm/foodgram_front:latest
     volumes:
       - ../frontend/:/app/result_build/
   nginx:
