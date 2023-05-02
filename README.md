@@ -92,13 +92,13 @@ docker-compose up -d --build
   - провести миграции внутри контейнеров
 
     ```bash
-    docker-compose exec web python manage.py migrate
+    docker-compose exec backend python manage.py migrate
     ```
 
   - Заполнить БД
 
     ```bash
-    docker-compose exec web python manage.py loaddata dump.json
+    docker-compose exec backend python manage.py loaddata dump.json
     ```
 
 ### Как запустить проект локально на dev-сервере
