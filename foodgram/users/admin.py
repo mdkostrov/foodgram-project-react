@@ -10,19 +10,24 @@ admin.site.unregister(Group)
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'username', 'pk', 'email',
-        'first_name', 'last_name',
-        'followers_count', 'recipes_count')
+        'pk',
+        'email',
+        'username',
+        'first_name',
+        'last_name',
+        'author_followers_count',
+        'author_recipes_count'
+    )
     list_filter = ('username', 'email')
     search_fields = ('username', 'email')
     empty_value_display = '-пусто-'
 
     @admin.display(description='Количество подписчиков')
-    def followers_count(self, user):
+    def author_followers_count(self, user):
         return user.following.count()
 
     @admin.display(description='Количество рецептов')
-    def recipes_count(self, user):
+    def author_recipes_count(self, user):
         return user.recipe_author.count()
 
 

@@ -1,5 +1,5 @@
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
 
 from users.models import User
 
@@ -9,15 +9,13 @@ MIN_VALUE = 1
 class Ingredient(models.Model):
     """Модель ингредиента"""
     name = models.CharField(
-        'Название ингредиента',
+        'Название',
         max_length=200,
         db_index=True,
-        help_text='Введите название ингредиента',
     )
     measurement_unit = models.CharField(
-        'Единица измерения ингредиента',
+        'Единицы измерения',
         max_length=200,
-        help_text='Введите единицу измерения',
     )
 
     class Meta:
@@ -32,7 +30,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
-        return f'{self.name}, {self.measurement_unit}.'
+        return f'{self.name} ({self.measurement_unit})'
 
 
 class Tag(models.Model):
@@ -41,13 +39,11 @@ class Tag(models.Model):
         'Название тега',
         unique=True,
         max_length=200,
-        help_text='Введите тег',
     )
     color = models.CharField(
         'Цвет тега',
         unique=True,
         max_length=7,
-        help_text='Укажите цвет тега',
     )
     slug = models.SlugField(
         'Слаг тега',
@@ -68,7 +64,6 @@ class Recipe(models.Model):
     name = models.CharField(
         'Название рецепта',
         max_length=200,
-        help_text='Введите название рецепта',
     )
     author = models.ForeignKey(
         User,
@@ -79,7 +74,6 @@ class Recipe(models.Model):
     image = models.ImageField(
         'Фото рецепта',
         upload_to='recipe_pics/',
-        help_text='Загрузить фото рецепта',
     )
     ingredients = models.ManyToManyField(
         Ingredient,
@@ -89,7 +83,6 @@ class Recipe(models.Model):
     )
     text = models.TextField(
         'Описание рецепта',
-        help_text='Опишите ваш рецепт здесь',
     )
     tags = models.ManyToManyField(
         Tag,
@@ -131,7 +124,7 @@ class RecipeIngredient(models.Model):
         'Количество',
         validators=[MinValueValidator(
             MIN_VALUE,
-            message='Количество ингредиентов не может быть меньше 1.')],
+            message='Количество ингредиентов не может быть меньше 1!')],
     )
 
     class Meta:
@@ -144,10 +137,8 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'Количество ингредиентов'
 
     def __str__(self):
-        return (f'{self.recipe.name}: '
-                f'{self.ingredient.name} - '
-                f'{self.amount} '
-                f'{self.ingredient.measurement_unit}')
+        return (f'{self.amount} {self.ingredient.measurement_unit}'
+                f'ингредиента {self.ingredient.name} в {self.recipe.name}')
 
 
 class FavoriteShoppingCart(models.Model):

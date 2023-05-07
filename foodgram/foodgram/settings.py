@@ -24,15 +24,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', default='DefaultSecretKey')
+SECRET_KEY = 'django-insecure-d+!v1l%#nju43%1+i8a14#9$yq1!8%!7nr0m_lfk=uf^6ahml='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-ENABLE_PROD = True
+ENABLE_PROD = False
 
 DEBUG = True
 
 if ENABLE_PROD:
     DEBUG = False
+    SECRET_KEY = os.getenv('SECRET_KEY', default='DefaultSecretKey')
 
 ALLOWED_HOSTS = ['*']
 
@@ -143,7 +144,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 6
+
 }
 
 DJOSER = {
@@ -155,7 +156,7 @@ DJOSER = {
     },
     'PERMISSIONS': {
         'user': ['rest_framework.permissions.IsAuthenticated'],
-        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user_list': ['rest_framework.permissions.IsAuthenticated'],
     },
 }
 

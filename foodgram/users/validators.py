@@ -12,7 +12,7 @@ def username_validator(value):
     if fullmatch(r'^[\w.@+-]+$', value) is None:
         raise ValidationError(
             'В имени пользователя допускаются только '
-            'буквы, цифры и @/./+/- знаки.',
+            'буквы, цифры и следующие знаки: @.+-',
             params={'value': value},
         )
     return value

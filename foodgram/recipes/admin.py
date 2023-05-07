@@ -7,7 +7,11 @@ from .models import (Ingredient, RecipeIngredient, Tag,
 # Register your models here.
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'measurement_unit')
+    list_display = (
+        'id',
+        'name',
+        'measurement_unit'
+    )
     list_display_links = ('id', 'name',)
     fields = ('name',)
     ordering = ('name',)
@@ -17,14 +21,23 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(RecipeIngredient)
 class RecipeIngredientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'recipe', 'ingredient', 'amount')
+    list_display = (
+        'id',
+        'recipe',
+        'ingredient',
+        'amount'
+    )
     search_fields = ('recipe', 'ingredient')
     list_filter = ('recipe', 'ingredient')
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'slug')
+    list_display = (
+        'name',
+        'color',
+        'slug'
+    )
     search_fields = ('name', 'color', 'slug')
     empty_value_display = '-пусто-'
 
@@ -38,9 +51,15 @@ class IngredientRecipeInline(admin.TabularInline):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     inlines = (IngredientRecipeInline,)
-    list_display = ('pk', 'name', 'author', 'text',
-                    'cooking_time', 'is_favorited',
-                    'ingredients_in_recipe')
+    list_display = (
+        'pk',
+        'name',
+        'author',
+        'text',
+        'cooking_time',
+        'is_favorited',
+        'ingredients_in_recipe'
+    )
     list_display_links = ('name',)
     fields = ('name', 'text',
               'author', 'image',
@@ -48,7 +67,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('name', 'author')
     list_filter = ('name', 'author', 'tags')
     empty_value_display = '-пусто-'
-    readonly_fields = ('is_favorited',)
+    readonly_fields = ('author', 'is_favorited')
 
     @admin.display(description='В избранном')
     def is_favorited(self, obj):
