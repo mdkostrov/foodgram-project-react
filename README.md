@@ -12,10 +12,6 @@ http://51.250.78.62/
 Суперпользователь (админ):
 логин: admin@admin.io
 пароль: admin
-
-Обычный пользователь:
-логин: tester@test.io
-пароль: testing31923test
 </details>
 
 ### Описание проекта.
@@ -98,8 +94,8 @@ HOST=<IP сервера>
 PASSPHRASE=<пароль для сервера, если он установлен>
 SSH_KEY=<ваш SSH ключ>
 
-TELEGRAM_TO=<ID чата, в который придет сообщение>
-TELEGRAM_TOKEN=<токен вашего бота>
+TELEGRAM_TO=<ID Telegram чата, в который придет сообщение>
+TELEGRAM_TOKEN=<токен Telegram бота>
 ```
 
 ```bash
