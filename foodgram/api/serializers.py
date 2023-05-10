@@ -262,12 +262,13 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     @atomic
     def recipe_ingredients(self, recipe, ingredients):
-        return [RecipeIngredient(
-                    recipe=recipe,
-                    ingredient=ingredient.get('ingredient'),
-                    amount=ingredient.get('amount')
-                )
-                for ingredient in ingredients]
+        return (
+            [RecipeIngredient(
+                recipe=recipe,
+                ingredient=ingredient.get('ingredient'),
+                amount=ingredient.get('amount')
+            ) for ingredient in ingredients]
+        )
 
     @atomic
     def create(self, validated_data):
