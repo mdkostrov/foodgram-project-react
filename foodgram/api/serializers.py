@@ -97,7 +97,7 @@ class FollowSerializer(serializers.ModelSerializer):
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
                 fields=('user', 'following'),
-                message=('Подписка на этого автора уже оформлена!')
+                message=('Подписка уже оформлена!')
             ),
         ]
 
@@ -108,9 +108,12 @@ class FollowSerializer(serializers.ModelSerializer):
             )
         return data
 
+    def create(self, validated_data):
+        return Follow.objects.create(**validated_data)
+
     def to_representation(self, instance):
         return SubscriptionsSerializer(
-            instance.user,
+            instance.following,
             context={
                 'request': self.context.get('request')
             }).data
@@ -128,6 +131,54 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    """Сериализатор избранного"""
+    class Meta:
+        model = Favorite
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message=('Рецепт уже в избранном!')
+            ),
+        ]
+
+    def create(self, validated_data):
+        return Favorite.objects.create(**validated_data)
+
+    def to_representation(self, instance):
+        return RecipePreviewSerializer(
+            instance.recipe,
+            context={
+                'request': self.context.get('request')
+            }).data
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    """Сериализатор списка покупок"""
+    class Meta:
+        model = ShoppingCart
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ShoppingCart.objects.all(),
+                fields=('user', 'recipe'),
+                message=('Рецепт уже в списке покупок!')
+            ),
+        ]
+
+    def create(self, validated_data):
+        return ShoppingCart.objects.create(**validated_data)
+
+    def to_representation(self, instance):
+        return RecipePreviewSerializer(
+            instance.recipe,
+            context={
+                'request': self.context.get('request')
+            }).data
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
