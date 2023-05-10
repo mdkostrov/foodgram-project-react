@@ -261,14 +261,13 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return value
 
     @atomic
-    def recipe_ingredients(self, recipe, ingredients):
-        return (
-            [RecipeIngredient(
+    def bulk_recipe_ingredients(self, recipe, ingredients):
+        recipe_ingredients = [RecipeIngredient(
                 recipe=recipe,
                 ingredient=ingredient.get('ingredient'),
                 amount=ingredient.get('amount')
             ) for ingredient in ingredients]
-        )
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     @atomic
     def create(self, validated_data):
@@ -276,8 +275,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        recipe_ingredients = self.recipe_ingredients(recipe, ingredients)
-        RecipeIngredient.objects.bulk_create(recipe_ingredients)
+        self.bulk_recipe_ingredients(recipe, ingredients)
         return recipe
 
     @atomic
@@ -288,8 +286,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             instance.tags.set(tags)
         if ingredients is not None:
             instance.ingredients.clear()
-            recipe_ingredients = self.recipe_ingredients(instance, ingredients)
-            RecipeIngredient.objects.bulk_create(recipe_ingredients)
+            self.bulk_recipe_ingredients(instance, ingredients)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
