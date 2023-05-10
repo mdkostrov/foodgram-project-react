@@ -198,7 +198,6 @@ http://localhost/api/docs/
 ### Об авторе
 
 Над проектом работал:
-
 **Костров Михаил**
 [GitHub](https://github.com/mdkostrov/)
 
