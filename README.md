@@ -200,5 +200,4 @@ http://localhost/api/docs/
 Над проектом работал:
 **Костров Михаил**
 [GitHub](https://github.com/mdkostrov/)
-
 Студент курса "Разработчик Python" (45-47 когорта). 2023 год.
