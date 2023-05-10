@@ -29,8 +29,7 @@ class MyUserViewSet(UserViewSet):
     def get_permissions(self):
         if self.action in ('subscribe', 'subscriptions'):
             return [IsAuthenticated()]
-        else:
-            return super().get_permissions()
+        return super().get_permissions()
 
     @action(detail=True, methods=['post'],
             pagination_class=FoodgramPagination)
@@ -44,21 +43,18 @@ class MyUserViewSet(UserViewSet):
             return Response({
                 'errors': 'Подписка уже оформлена!'
             }, status=status.HTTP_400_BAD_REQUEST)
-        data = Follow.objects.create(user=request.user, following=author)
+        follow = Follow.objects.create(user=request.user, following=author)
         serializer = FollowSerializer(
-            data=data, context={'request': request}
+            follow, context={'request': request}
         )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
     def subscribe_delete(self, request, id=None):
         author = get_object_or_404(User, pk=id)
-        if Follow.objects.filter(user=request.user, following=author).exists():
-            get_object_or_404(
-                Follow,
-                user=request.user,
-                following=author
-            ).delete()
+        follow = Follow.objects.filter(user=request.user, following=author)
+        if follow.exists():
+            follow.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({
             'errors': 'Подписка уже отменена!'
@@ -132,15 +128,14 @@ class RecipeViewSet(ModelViewSet):
             Favorite.objects.create(user=user, recipe=recipe)
             serializer = RecipePreviewSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif request.method == 'DELETE':
+        if request.method == 'DELETE':
             if not instance.exists():
                 return Response({
                     'errors': 'Рецепт уже удален из избранного!'
                 }, status=status.HTTP_400_BAD_REQUEST)
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
@@ -156,15 +151,14 @@ class RecipeViewSet(ModelViewSet):
             ShoppingCart.objects.create(user=user, recipe=recipe)
             serializer = RecipePreviewSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif request.method == 'DELETE':
+        if request.method == 'DELETE':
             if not instance.exists():
                 return Response({
                     'errors': 'Рецепт отсутствовал в списке покупок!'
                 }, status=status.HTTP_400_BAD_REQUEST)
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(detail=False,
             permission_classes=[IsAuthenticated])
@@ -176,9 +170,10 @@ class RecipeViewSet(ModelViewSet):
             measurement=F('measurement_unit')
         ).annotate(total=Sum('ingredients_list__amount')).order_by('-total')
         shopping_list = ['Список покупок: ', ]
-        for num, i in enumerate(ingredients):
+        for num, item in enumerate(ingredients):
             shopping_list.append(
-                f'{num + 1}. {i["name"]} = {i["total"]} {i["measurement"]}'
+                f'{num + 1}. {item["name"]} = '
+                f'{item["total"]} {item["measurement"]}'
             )
         text = '\n'.join(shopping_list)
         filename = 'foodgram_shopping_list.txt'

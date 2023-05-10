@@ -188,3 +188,23 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media_back')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Минимальное значение для времени приготовления рецепта
+# и количества ингредиентов в рецепте
+MIN_VALUE = 1
+
+# Максимальное значение для времени приготовления рецепта
+# и количества ингредиентов в рецепте
+MAX_VALUE = 32000
+
+# Максимальная длина полей типа CharField и SlugField в проекте
+MAX_LENGTH = 200
+
+# Максимальная длина для цвета в HEX-формате
+COLOR_NAME_LENGTH = 7
+
+# Максимальная длина для полей имени, фамилии и имени никнейма
+NAME_MAX_LENGTH = 150
+
+# Максимальная длина поля Email
+EMAIL_MAX_LENGTH = 254

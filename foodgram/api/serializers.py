@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
 from djoser.serializers import UserSerializer
@@ -72,10 +73,7 @@ class SubscriptionsSerializer(UserSerializer):
         request = self.context.get('request')
         if request.user.is_anonymous:
             return False
-        return Follow.objects.filter(
-            user=request.user,
-            following=obj.pk
-        ).exists()
+        return obj.following.filter(user=request.user).exists()
 
     def get_recipes(self, obj):
         request = self.context.get('request')
@@ -109,6 +107,13 @@ class FollowSerializer(serializers.ModelSerializer):
                 'Нельзя подписываться на самого себя!'
             )
         return data
+
+    def to_representation(self, instance):
+        return SubscriptionsSerializer(
+            instance.user,
+            context={
+                'request': self.context.get('request')
+            }).data
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -155,9 +160,13 @@ class CreateIngredientRecipeSerializator(serializers.ModelSerializer):
         fields = ('id', 'amount')
 
     def validate_amount(self, value):
-        if value < 1:
+        if value < settings.MIN_VALUE:
             raise serializers.ValidationError(
                 'Количество ингредиента должно быть положительным!'
+            )
+        if value > settings.MAX_VALUE:
+            raise serializers.ValidationError(
+                'Количество ингредиента должно быть меньше 32000!'
             )
         return value
 
@@ -241,11 +250,24 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return data
 
     def validate_cooking_time(self, value):
-        if value <= 0:
+        if value < settings.MIN_VALUE:
             raise serializers.ValidationError(
                 'Время приготовления не может быть нулевым или отрицательным!'
             )
+        if value > settings.MAX_VALUE:
+            raise serializers.ValidationError(
+                'Время приготовления должно быть меньше 32000!'
+            )
         return value
+
+    @atomic
+    def recipe_ingredients(self, recipe, ingredients):
+        return [RecipeIngredient(
+                    recipe=recipe,
+                    ingredient=ingredient.get('ingredient'),
+                    amount=ingredient.get('amount')
+                )
+                for ingredient in ingredients]
 
     @atomic
     def create(self, validated_data):
@@ -253,16 +275,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        recipe_ingredients = [
-            RecipeIngredient(
-                recipe=recipe,
-                ingredient=ingredient.get('ingredient'),
-                amount=ingredient.get('amount')
-            )
-            for ingredient in ingredients]
-        RecipeIngredient.objects.bulk_create(
-            recipe_ingredients
-        )
+        recipe_ingredients = self.recipe_ingredients(recipe, ingredients)
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
         return recipe
 
     @atomic
@@ -273,17 +287,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             instance.tags.set(tags)
         if ingredients is not None:
             instance.ingredients.clear()
-            recipe_ingredients = [
-                RecipeIngredient(
-                    recipe=instance,
-                    ingredient=ingredient['ingredient'],
-                    amount=ingredient['amount']
-                )
-                for ingredient in ingredients
-            ]
-            RecipeIngredient.objects.bulk_create(
-                recipe_ingredients
-            )
+            recipe_ingredients = self.recipe_ingredients(instance, ingredients)
+            RecipeIngredient.objects.bulk_create(recipe_ingredients)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):

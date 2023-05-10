@@ -17,12 +17,14 @@ class Command(BaseCommand):
                 encoding='utf-8'
             ) as file:
                 read_data = csv.reader(file)
+                bulk_list = list()
                 for items in read_data:
                     name, measurement_unit = items
-                    Ingredient.objects.get_or_create(
-                        name=name,
-                        measurement_unit=measurement_unit
+                    bulk_list.append(
+                        Ingredient(name=name,
+                                   measurement_unit=measurement_unit)
                     )
+                Ingredient.objects.bulk_create(bulk_list)
             self.stdout.write(self.style.SUCCESS('Все ингридиенты загружены!'))
         except FileNotFoundError:
             raise CommandError('Добавьте файл ingredients в директорию data')

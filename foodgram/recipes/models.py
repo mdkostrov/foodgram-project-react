@@ -1,21 +1,20 @@
-from django.core.validators import MinValueValidator
+from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from users.models import User
-
-MIN_VALUE = 1
 
 
 class Ingredient(models.Model):
     """Модель ингредиента"""
     name = models.CharField(
         'Название',
-        max_length=200,
+        max_length=settings.MAX_LENGTH,
         db_index=True,
     )
     measurement_unit = models.CharField(
         'Единицы измерения',
-        max_length=200,
+        max_length=settings.MAX_LENGTH,
     )
 
     class Meta:
@@ -38,20 +37,21 @@ class Tag(models.Model):
     name = models.CharField(
         'Название тега',
         unique=True,
-        max_length=200,
+        max_length=settings.MAX_LENGTH,
     )
     color = models.CharField(
         'Цвет тега',
         unique=True,
-        max_length=7,
+        max_length=settings.COLOR_NAME_LENGTH,
     )
     slug = models.SlugField(
         'Слаг тега',
         unique=True,
-        max_length=200,
+        max_length=settings.MAX_LENGTH,
     )
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 
@@ -63,7 +63,7 @@ class Recipe(models.Model):
     """Модель рецепта"""
     name = models.CharField(
         'Название рецепта',
-        max_length=200,
+        max_length=settings.MAX_LENGTH,
     )
     author = models.ForeignKey(
         User,
@@ -92,9 +92,18 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления',
-        validators=[MinValueValidator(
-            MIN_VALUE,
-            message='Время приготовления не может быть меньше 1 минуты.')],
+        validators=[
+            MinValueValidator(
+                settings.MIN_VALUE,
+                message=f'Время приготовления не может быть '
+                        f'меньше {settings.MIN_VALUE} минут(-ы).'
+            ),
+            MaxValueValidator(
+                settings.MAX_VALUE,
+                message=f'Время приготовления не может быть '
+                        f'больше {settings.MAX_VALUE} минут(-ы).'
+            )
+        ],
     )
 
     class Meta:
@@ -122,9 +131,18 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         'Количество',
-        validators=[MinValueValidator(
-            MIN_VALUE,
-            message='Количество ингредиентов не может быть меньше 1!')],
+        validators=[
+            MinValueValidator(
+                settings.MIN_VALUE,
+                message=f'Количество не может быть '
+                        f'меньше {settings.MIN_VALUE}'
+            ),
+            MaxValueValidator(
+                settings.MAX_VALUE,
+                message=f'Количество не может быть '
+                        f'больше {settings.MAX_VALUE}'
+            )
+        ],
     )
 
     class Meta:
@@ -132,7 +150,7 @@ class RecipeIngredient(models.Model):
             fields=['ingredient', 'recipe'],
             name='unique_ingredient_recipe'),
         ]
-        ordering = ['-id']
+        ordering = ('-pk',)
         verbose_name = 'Количество ингредиента'
         verbose_name_plural = 'Количество ингредиентов'
 
@@ -169,6 +187,7 @@ class Favorite(FavoriteShoppingCart):
             name='unique_favorite')
         ]
         default_related_name = 'favorite'
+        ordering = ('-recipe',)
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
 
@@ -181,5 +200,6 @@ class ShoppingCart(FavoriteShoppingCart):
             name='unique_shopping')
         ]
         default_related_name = 'shopping_cart'
+        ordering = ('-recipe',)
         verbose_name = 'Покупки'
         verbose_name_plural = 'Покупки'
