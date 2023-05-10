@@ -263,10 +263,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     @atomic
     def bulk_recipe_ingredients(self, recipe, ingredients):
         recipe_ingredients = [RecipeIngredient(
-                recipe=recipe,
-                ingredient=ingredient.get('ingredient'),
-                amount=ingredient.get('amount')
-            ) for ingredient in ingredients]
+            recipe=recipe,
+            ingredient=ingredient.get('ingredient'),
+            amount=ingredient.get('amount')
+        ) for ingredient in ingredients]
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     @atomic
