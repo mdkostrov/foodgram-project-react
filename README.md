@@ -2,18 +2,6 @@
 
 ![Workflow repository status](https://github.com/mdkostrov/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 
-<details>
-<summary>
->>>Для ревьюера<<<
-</summary>
-АДРЕС ПРОЕКТА НА ВМ ДЛЯ РЕВЬЮ:
-http://51.250.78.62/
-
-Суперпользователь (админ):
-логин: admin@admin.io
-пароль: admin
-</details>
-
 ### Описание проекта.
 
 Проект представляет собой сервис для публикации рецептов.
